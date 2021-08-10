@@ -1,4 +1,7 @@
+artifacts
+cache
+coverage
 node_modules
 typechain
-.secret
 coverage.json
+.secret
