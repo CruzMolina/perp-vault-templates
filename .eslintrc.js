@@ -1,23 +1,15 @@
+/* eslint-env node */
+
 module.exports = {
-  env: {
-    mocha: true,
-  },
-  extends: ["airbnb", "plugin:prettier/recommended"],
-  plugins: ["babel"],
+  root: true,
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+  ],
   rules: {
-    "prettier/prettier": ["error"],
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      {
-        js: "never",
-        ts: "never",
-      },
-    ],
-    "import/prefer-default-export": "off",
-    "prefer-destructuring": "off",
-    "prefer-template": "off",
-    "no-console": "off",
-    "func-names": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
   },
 };
