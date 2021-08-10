@@ -1,24 +1,44 @@
-# OpynPerpVault contracts
+# @stakedao/opyn-perp-vault
 
-## Install
+StakeDaoPerpVault Solidity smart contracts
 
+
+## Prerequisites
+
+- [NodeJS](https://nodejs.org/en/)
+  -  v12.22.4 <=
+
+## Installation
+
+To install all necessary dependencies, from project root run:
+
+```shell
+npm ci
 ```
-npm install
+
+add a `.secret` file containing your testing mnemonic at the project root folder.
+
+## Compiling contracts
+
+To compile the contracts, from project root run:
+
+```shell
+npm run compile
 ```
 
-add a `.secret` file containing your testing mnemonic in the current folder.
+## Testing contracts
 
-## Test
+To test the contracts, from project root run the following:
 
-### Run unit tests
+### Running unit tests
 
-```
+```shell
 npm run test
 ```
 
 ### Mainnet fork test
 
-```
+```shell
 npm run test:fork
 ```
 
@@ -26,6 +46,6 @@ npm run test:fork
 
 Generate test coverage report
 
-```
-npx hardhat coverage
+```shell
+npm run test:coverage
 ```
