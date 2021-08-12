@@ -89,7 +89,6 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   constructor (
     address _sdToken,
     address _curve,
-    address _owner,
     address _feeRecipient,
     string memory _tokenName,
     string memory _tokenSymbol
