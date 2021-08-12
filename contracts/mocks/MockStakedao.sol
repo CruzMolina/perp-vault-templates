@@ -30,7 +30,7 @@ contract MockStakedao is ERC20PermitUpgradeable {
       return 1 ether;
   }
 
-  function token () public returns (address) {
+  function token () public view returns (address) {
       return ecrv;
   }
 
