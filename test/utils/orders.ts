@@ -9,7 +9,7 @@ export const getOrder = async (
   signerToken: string,
   signerTokenAmount: string | number,
   swapContract: string,
-  privateKey: any,
+  privateKey: string,
 ): Promise<any> => {
   const order = createOrder({
     signer: {
