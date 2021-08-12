@@ -36,7 +36,7 @@ contract StakedaoEcrvPricer {
         address _underlying,
         address _oracle, 
         address _curve
-    ) public {
+    ) {
         require(_lpToken != address(0), "StakeDaoPricer: lpToken address can not be 0");
         require(_underlying != address(0), "StakeDaoPricer: underlying address can not be 0");
         require(_oracle != address(0), "StakeDaoPricer: oracle address can not be 0");
