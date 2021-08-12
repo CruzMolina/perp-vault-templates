@@ -84,7 +84,7 @@ contract StakedaoEcrvPricer {
         return pricePerShare.mul(_underlyingPrice).mul(curvePrice).div(10**uint256(2 * underlyingDecimals));
     }
 
-    function getHistoricalPrice(uint80) external view returns (uint256, uint256) {
+    function getHistoricalPrice(uint80) external pure returns (uint256, uint256) {
         revert("StakeDaoPricer: Deprecated");
     }
 }
