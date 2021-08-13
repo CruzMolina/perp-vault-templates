@@ -2,7 +2,7 @@
 pragma solidity >=0.7.2;
 pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
 
@@ -24,7 +24,7 @@ import { SwapTypes } from '../libraries/SwapTypes.sol';
  * @author Opyn Team
  */
 
-contract RollOverBase is OwnableUpgradeable {
+contract RollOverBase is Ownable {
   address public otoken;
   address public nextOToken;
 
