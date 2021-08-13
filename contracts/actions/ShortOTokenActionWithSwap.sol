@@ -171,6 +171,7 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
     if (otoken != address(0) && lockedAsset != 0) { 
       return _canSettleVault();
     }
+
     return block.timestamp > rolloverTime + 1 days; 
   }
 
@@ -178,8 +179,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
    * @dev open vault with vaultId 1. this should only be performed once when contract is initiated
    */
   function _openVault(uint256 _vaultType) internal {
-
     bytes memory data;
+
     if (_vaultType != 0) {
       data = abi.encode(_vaultType);
     }
@@ -263,7 +264,6 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
    * @dev settle vault 0 and withdraw all locked collateral
    */
   function _settleVault() internal {
-
     IController.ActionArgs[] memory actions = new IController.ActionArgs[](1);
     // this action will always use vault id 1
     actions[0] = IController.ActionArgs(
