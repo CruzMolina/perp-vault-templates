@@ -92,10 +92,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
     _openVault(_vaultType);
   }
 
-  modifier onlyVault() {
+  function onlyVault() private view {
     require(msg.sender == vault, "S1");
-
-    _;
   }
 
   /**
@@ -112,7 +110,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
   /**
    * @dev the function that the vault will call when the round is over
    */
-  function closePosition() external onlyVault override {
+  function closePosition() external override {
+    onlyVault();
     require(canClosePosition(), 'S2');
     
     if(_canSettleVault()) {
@@ -129,7 +128,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
   /**
    * @dev the function that the vault will call when the new round is starting
    */
-  function rolloverPosition() external onlyVault override {
+  function rolloverPosition() external override {
+    onlyVault();
     
     // this function can only be called when it's `Committed`
     _rollOverNextOTokenAndActivate();
