@@ -49,12 +49,12 @@ contract RollOverBase is OwnableUpgradeable {
   IWhitelist public opynWhitelist;
 
   modifier onlyCommitted () {
-    require(state == ActionState.Committed, "!COMMITED");
+    require(state == ActionState.Committed, "R1");
     _;
   }
 
   modifier onlyActivated () {
-    require(state == ActionState.Activated, "!Activated");
+    require(state == ActionState.Activated, "R2");
     _;
   }
 
@@ -69,7 +69,7 @@ contract RollOverBase is OwnableUpgradeable {
    * or re-commit it if needed during the commit phase.
    */
   function commitOToken(address _nextOToken) external onlyOwner {
-    require(state != ActionState.Activated, "Activated");
+    require(state != ActionState.Activated, "R3");
     _checkOToken(_nextOToken);
     nextOToken = _nextOToken;
 
@@ -84,7 +84,7 @@ contract RollOverBase is OwnableUpgradeable {
   }
 
   function _rollOverNextOTokenAndActivate() internal onlyCommitted {
-    require(block.timestamp - commitStateStart > MIN_COMMIT_PERIOD, "COMMIT_PHASE_NOT_OVER");
+    require(block.timestamp - commitStateStart > MIN_COMMIT_PERIOD, "R4");
 
     otoken = nextOToken;
     nextOToken = address(0);
@@ -93,7 +93,7 @@ contract RollOverBase is OwnableUpgradeable {
   }
 
   function _checkOToken(address _nextOToken) private view {
-    require(opynWhitelist.isWhitelistedOtoken(_nextOToken), '!OTOKEN');
+    require(opynWhitelist.isWhitelistedOtoken(_nextOToken), 'R5');
     _customOTokenCheck(_nextOToken);
   }
 
