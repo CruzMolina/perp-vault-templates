@@ -2,7 +2,6 @@
 pragma solidity >=0.7.2;
 pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
@@ -37,7 +36,7 @@ import { RollOverBase } from '../utils/RollOverBase.sol';
  * @author Opyn Team
  */
 
-contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, RollOverBase {
+contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
 
@@ -89,7 +88,6 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
 
     _initSwapContract(_swap);
     _initRollOverBase(_opynWhitelist);
-    __Ownable_init();
 
     _openVault(_vaultType);
   }
