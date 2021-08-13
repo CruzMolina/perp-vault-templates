@@ -141,7 +141,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
    * by filling an order on AirSwap.
    * this can only be done in "activated" state. which is achievable by calling `rolloverPosition`
    */
-  function mintAndSellOToken(uint256 _collateralAmount, uint256 _otokenAmount, SwapTypes.Order memory _order) external onlyOwner onlyActivated {
+  function mintAndSellOToken(uint256 _collateralAmount, uint256 _otokenAmount, SwapTypes.Order memory _order) external onlyOwner {
+    onlyActivated();
     require(_order.sender.wallet == address(this), 'S3');
     require(_order.sender.token == otoken, 'S4');
     require(_order.signer.token == address(weth), 'S5');

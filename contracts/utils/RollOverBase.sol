@@ -47,17 +47,14 @@ contract RollOverBase is Ownable {
   }
 
   ActionState public state;
-
   IWhitelist public opynWhitelist;
 
-  modifier onlyCommitted () {
+  function onlyCommitted() private view {
     require(state == ActionState.Committed, "R1");
-    _;
   }
 
-  modifier onlyActivated () {
+  function onlyActivated() public view {
     require(state == ActionState.Activated, "R2");
-    _;
   }
 
 
@@ -80,12 +77,14 @@ contract RollOverBase is Ownable {
     commitStateStart = block.timestamp;
   }
 
-  function _setActionIdle() internal onlyActivated {
+  function _setActionIdle() internal {
+    onlyActivated();
     // wait for the owner to set the next option
     state = ActionState.Idle;
   }
 
-  function _rollOverNextOTokenAndActivate() internal onlyCommitted {
+  function _rollOverNextOTokenAndActivate() internal {
+    onlyCommitted();
     require(block.timestamp - commitStateStart > MIN_COMMIT_PERIOD, "R4");
 
     otoken = nextOToken;
