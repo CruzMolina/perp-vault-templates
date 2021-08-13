@@ -213,13 +213,12 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
     uint256[2] memory amounts;
     amounts[0] = wethBalance;
     amounts[1] = 0;
-    uint256 minAmount = 0;
 
     //unwrap weth => eth to deposit on curve
     weth.withdraw(wethBalance);
     // deposit ETH to curve
     require(address(this).balance == wethBalance, 'S8');
-    curve.add_liquidity{value:wethBalance}(amounts, minAmount);
+    curve.add_liquidity{value:wethBalance}(amounts, 0); // minimum amount to deposit is 0 ETH
     uint256 ecrvToDeposit = ecrv.balanceOf(address(this));
 
     // deposit ecrv to stakedao
