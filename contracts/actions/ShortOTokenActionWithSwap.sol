@@ -19,8 +19,6 @@ import { IStakeDao } from '../interfaces/IStakeDao.sol';
 import { ICurve } from '../interfaces/ICurve.sol';
 import { IWETH } from '../interfaces/IWETH.sol'; 
 
-import "hardhat/console.sol";
-
 contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, RollOverBase {
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
