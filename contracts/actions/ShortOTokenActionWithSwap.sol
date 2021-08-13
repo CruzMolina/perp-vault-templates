@@ -19,6 +19,25 @@ import { IStakeDao } from '../interfaces/IStakeDao.sol';
 import { ICurve } from '../interfaces/ICurve.sol';
 import { IWETH } from '../interfaces/IWETH.sol'; 
 
+/**
+ * Error Codes
+ * S1: msg.sender must be the vault
+ * S2: cannot currently close the vault position
+ * S3: seller for the order (_order.sender.wallet) must be this contract
+ * S4: token to sell (_order.sender.token) must be the currently activated oToken
+ * S5: token to sell for (_order.signer.token) must be WETH
+ * S6: tokens being sold (_order.sender.amount) and tokens being minted (_otokenAmount) must be the same
+ * S7: amount of WETH being sold for (_order.signer.amount) does not meet the minimum option premium
+ * S8: unable to unwrap WETH to ETH and add liquidity to curve: insufficient ETH
+ * S9: strike price for the next oToken is too low
+ * S10: expiry timestamp for the next oToken is invalid
+ */
+
+/**
+ * @title ShortOTokenActionWithSwap
+ * @author Opyn Team
+ */
+
 contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, RollOverBase {
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
@@ -98,7 +117,7 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
    * @dev the function that the vault will call when the round is over
    */
   function closePosition() external onlyVault override {
-    require(canClosePosition(), "Cannot close position");
+    require(canClosePosition(), 'S2');
     
     if(_canSettleVault()) {
       _settleVault();
@@ -127,11 +146,11 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
    * this can only be done in "activated" state. which is achievable by calling `rolloverPosition`
    */
   function mintAndSellOToken(uint256 _collateralAmount, uint256 _otokenAmount, SwapTypes.Order memory _order) external onlyOwner onlyActivated {
-    require(_order.sender.wallet == address(this), '!Sender');
-    require(_order.sender.token == otoken, 'Can only sell otoken');
-    require(_order.signer.token == address(weth), 'Can only sell for weth');
-    require(_order.sender.amount == _otokenAmount, 'Need to sell all otokens minted');
-    require(_collateralAmount.mul(MIN_PROFITS).div(BASE) <= _order.signer.amount, 'Need minimum option premium');
+    require(_order.sender.wallet == address(this), 'S3');
+    require(_order.sender.token == otoken, 'S4');
+    require(_order.signer.token == address(weth), 'S5');
+    require(_order.sender.amount == _otokenAmount, 'S6');
+    require(_collateralAmount.mul(MIN_PROFITS).div(BASE) <= _order.signer.amount, 'S7');
 
     // mint options
     _mintOTokens(_collateralAmount, _otokenAmount);
@@ -203,7 +222,7 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
     //unwrap weth => eth to deposit on curve
     weth.withdraw(wethBalance);
     // deposit ETH to curve
-    require(address(this).balance == wethBalance, 'insufficient ETH');
+    require(address(this).balance == wethBalance, 'S8');
     curve.add_liquidity{value:wethBalance}(amounts, minAmount);
     uint256 ecrvToDeposit = ecrv.balanceOf(address(this));
 
@@ -284,10 +303,10 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
    * so accessing otoken will give u the current otoken. 
    */
   function _customOTokenCheck(address _nextOToken) internal view override {
-    // Can override or replace this. 
+    // Can override or replace this.
      IOToken otokenToCheck = IOToken(_nextOToken);
-     require(_isValidStrike(otokenToCheck.strikePrice()), 'Strike Price Too Low');
-     require (_isValidExpiry(otokenToCheck.expiryTimestamp()), 'Invalid expiry');
+     require(_isValidStrike(otokenToCheck.strikePrice()), 'S9');
+     require (_isValidExpiry(otokenToCheck.expiryTimestamp()), 'S10');
     /**
      * e.g.
      * check otoken strike price is lower than current spot price for put.
