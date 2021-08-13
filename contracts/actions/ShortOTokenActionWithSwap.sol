@@ -299,9 +299,8 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
    */
   function _customOTokenCheck(address _nextOToken) internal view override {
     // Can override or replace this.
-     IOToken otokenToCheck = IOToken(_nextOToken);
-     require(_isValidStrike(otokenToCheck.strikePrice()), 'S9');
-     require (_isValidExpiry(otokenToCheck.expiryTimestamp()), 'S10');
+     require(_isValidStrike(IOToken(_nextOToken).strikePrice()), 'S9');
+     require (_isValidExpiry(IOToken(_nextOToken).expiryTimestamp()), 'S10');
     /**
      * e.g.
      * check otoken strike price is lower than current spot price for put.
