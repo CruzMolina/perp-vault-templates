@@ -31,16 +31,18 @@ contract RollOverBase is Ownable {
   uint256 constant public MIN_COMMIT_PERIOD = 18 hours;
   uint256 public commitStateStart;
 
+/**
+ * Idle: action will go "idle" after the vault closes this position & before the next oToken is committed.
+ *
+ * Committed: owner has already set the next oToken this vault is trading. During this phase, all funds are
+ * already back in the vault and waiting for redistribution. Users who don't agree with the setting of the next
+ * round can withdraw.
+ *
+ * Activated: after vault calls "rollover", the owner can start minting / buying / selling according to each action.
+ */
   enum ActionState {
-    // action will go "idle" after the vault close this position, and before the next otoken is committed.
     Idle,
-
-    // onwer already set the next otoken this vault is trading.
-    // during this phase, all funds are already back in the vault and waiting for re-distribution
-    // users who don't agree with the setting of next round can withdraw.
     Committed,
-
-    // after vault calls "rollover", owner can start minting / buying / selling according to each action.
     Activated
   }
 
