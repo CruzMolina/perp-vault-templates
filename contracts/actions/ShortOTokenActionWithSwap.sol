@@ -3,21 +3,20 @@ pragma solidity >=0.7.2;
 pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
-import { AirswapBase } from '../utils/AirswapBase.sol';
-import { RollOverBase } from '../utils/RollOverBase.sol';
-
-import { SwapTypes } from '../libraries/SwapTypes.sol';
+import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
-import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
 
-import { IController } from '../interfaces/IController.sol';
 import { IAction } from '../interfaces/IAction.sol';
+import { IController } from '../interfaces/IController.sol';
+import { ICurve } from '../interfaces/ICurve.sol';
 import { IOracle } from '../interfaces/IOracle.sol';
 import { IOToken } from '../interfaces/IOToken.sol';
 import { IStakeDao } from '../interfaces/IStakeDao.sol';
-import { ICurve } from '../interfaces/ICurve.sol';
 import { IWETH } from '../interfaces/IWETH.sol'; 
+import { SwapTypes } from '../libraries/SwapTypes.sol';
+import { AirswapBase } from '../utils/AirswapBase.sol';
+import { RollOverBase } from '../utils/RollOverBase.sol';
 
 /**
  * Error Codes
@@ -42,6 +41,8 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
   using SafeERC20 for IERC20;
   using SafeMath for uint256;
 
+  address public immutable vault;
+
    /// @dev 100%
   uint256 constant public BASE = 10000;
   /// @dev the minimum strike price of the option chosen needs to be at least 105% of spot. 
@@ -51,15 +52,12 @@ contract ShortOTokenActionWithSwap is IAction, OwnableUpgradeable, AirswapBase, 
   uint256 public lockedAsset;
   uint256 public rolloverTime;
 
-  address public immutable vault;
   IController public controller;
-  IOracle public oracle; 
-  IStakeDao public stakedao;
   ICurve public curve;
   IERC20 ecrv;
+  IOracle public oracle;
+  IStakeDao public stakedao;
   IWETH weth;
-  
-
 
   constructor(
     address _vault,
