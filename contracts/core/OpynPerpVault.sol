@@ -70,6 +70,9 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   /// @dev Cap for the vault. hardcoded at 1000 for initial release
   uint256 public cap = 1000 ether;
 
+  /// @dev withdrawal fee percentage. 50 being 0.5%
+  uint256 public withdrawalFeePercentage = 50;
+
   /// @dev how many percentage should be reserved in vault for withdraw. 1000 being 10%
   uint256 public withdrawReserve;
 
@@ -320,6 +323,13 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   /**
    * @dev set the percentage that should be reserved in vault for withdraw
    */
+  function setWithdrawalFeePercentage(uint256 _newWithdrawalFeePercentage) external onlyOwner {
+    withdrawalFeePercentage = _newWithdrawalFeePercentage;
+  }
+
+  /**
+   * @dev set the percentage that should be reserved in vault for withdraw
+   */
   function setWithdrawReserve(uint256 _reserve) external onlyOwner {
     require(_reserve < 5000, "O16");
     withdrawReserve = _reserve;
@@ -392,10 +402,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   /**
    * @dev get amount of fee charged based on total amount of weth withdrawing.
    */
-  function _getWithdrawFee(uint256 _withdrawAmount) internal pure returns (uint256) {
-    // todo: add fee model
-    // currently fixed at 0.5% 
-    return _withdrawAmount.mul(50).div(BASE);
+  function _getWithdrawFee(uint256 _withdrawAmount) internal view returns (uint256) {
+    return _withdrawAmount.mul(withdrawalFeePercentage).div(BASE);
   }
 
   /**
