@@ -31,8 +31,9 @@ import { IStakeDao } from '../interfaces/IStakeDao.sol';
  * O14: unable to rollover vault, the calculated percentage sum (sumPercentage) is greater than the base (BASE)
  * O15: unable to rollover vault, the calculated percentage sum (sumPercentage) is not equal to the base (BASE)
  * O16: withdraw reserve percentage must be less than 50% (5000)
- * O17: cannot call resumeFromPause, vault is not in emergency state
- * O18: cannot receive ETH from any address other than the curve pool address (curvePool)
+ * O17: cannot call emergencyPause, vault is already in emergency state
+ * O18: cannot call resumeFromPause, vault is not in emergency state
+ * O19: cannot receive ETH from any address other than the curve pool address (curvePool)
  */
 
 /** 
@@ -328,6 +329,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    * @dev set the state to "Emergency", which disable all withdraw and deposit
    */
   function emergencyPause() external onlyOwner {
+    require(state != VaultState.Emergency, "O17");
+
     stateBeforePause = state;
     state = VaultState.Emergency;
 
@@ -338,7 +341,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    * @dev set the state from "Emergency", which disable all withdraw and deposit
    */
   function resumeFromPause() external onlyOwner {
-    require(state == VaultState.Emergency, "O17");
+    require(state == VaultState.Emergency, "O18");
+
     state = stateBeforePause;
 
     emit StateUpdated(stateBeforePause);
@@ -398,6 +402,6 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
     * @notice the receive ether function is called whenever the call data is empty
     */
   receive() external payable {
-    require(msg.sender == address(curvePool), "O18");
+    require(msg.sender == address(curvePool), "O19");
   }
 }
