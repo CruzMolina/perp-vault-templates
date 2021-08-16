@@ -25,9 +25,9 @@ const mnemonic = fs.existsSync('.secret')
   : 'test test test test test test test test test test test junk';
 
 enum VaultState {
+  Emergency,
   Locked,
   Unlocked,
-  Emergency
 }
 
 enum ActionState {

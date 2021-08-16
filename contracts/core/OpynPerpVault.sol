@@ -2,15 +2,16 @@
 pragma solidity >=0.7.2;
 pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import { IAction } from '../interfaces/IAction.sol';
+import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
+import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import { SafeERC20 } from '@openzeppelin/contracts/token/ERC20/SafeERC20.sol';
-import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
-import { IStakeDao } from '../interfaces/IStakeDao.sol';
+
+import { IAction } from '../interfaces/IAction.sol';
 import { ICurve } from '../interfaces/ICurve.sol';
+import { IStakeDao } from '../interfaces/IStakeDao.sol';
 
 /** 
  * @dev implementation of the Opyn Perp Vault contract that works with stakedao's ETH strategy. 
@@ -21,52 +22,51 @@ import { ICurve } from '../interfaces/ICurve.sol';
  */
 
 contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
-  using SafeMath for uint256;
   using SafeERC20 for IERC20;
+  using SafeMath for uint256;
 
   enum VaultState {
+    Emergency,
     Locked,
-    Unlocked,
-    Emergency
+    Unlocked
   }
-
-  VaultState public state;
-
-  VaultState public stateBeforePause;
-
-  uint256 public constant BASE = 10000; // 100%
-
-  /// @dev how many percentage should be reserved in vault for withdraw. 1000 being 10%
-  uint256 public withdrawReserve;
-
-  /// @dev stake dao sdecrvAddress
-  address public sdecrvAddress;
-
-  /// @dev address to which all fees are sent 
-  address public feeRecipient;
 
   /// @dev actions that build up this strategy (vault)
   address[] public actions;
 
+  /// @dev address to which all fees are sent
+  address public feeRecipient;
+
+  /// @dev stake dao sdecrvAddress
+  address public sdecrvAddress;
+
+  uint256 public constant BASE = 10000; // 100%
+
   /// @dev Cap for the vault. hardcoded at 1000 for initial release
   uint256 public cap = 1000 ether;
 
+  /// @dev how many percentage should be reserved in vault for withdraw. 1000 being 10%
+  uint256 public withdrawReserve;
+
   /// @dev curvePool ETH/sETH stableswap 
   ICurve public curvePool;
+
+  VaultState public state;
+  VaultState public stateBeforePause;
 
   /*=====================
    *       Events       *
    *====================*/
 
-  event Deposit(address account, uint256 amountDeposited, uint256 shareMinted);
+  event CapUpdated(uint256 newCap);
 
-  event Withdraw(address account, uint256 amountWithdrawn, uint256 fee, uint256 shareBurned);
+  event Deposit(address account, uint256 amountDeposited, uint256 shareMinted);
 
   event Rollover(uint256[] allocations);
 
   event StateUpdated(VaultState state);
 
-  event CapUpdated(uint256 newCap);
+  event Withdraw(address account, uint256 amountWithdrawn, uint256 fee, uint256 shareBurned);
 
   /*=====================
    *     Modifiers      *
@@ -81,7 +81,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   }
   
   /**
-   * @dev can only be executed if vault is not in emergency state.
+   * @dev can only be executed if vault is not in emergency state
    */
   modifier notEmergency {
     require(state != VaultState.Emergency, "Emergency");
@@ -98,7 +98,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
     address _feeRecipient,
     string memory _tokenName,
     string memory _tokenSymbol
-    ) ERC20(_tokenName, _tokenSymbol) {     
+    ) ERC20(_tokenName, _tokenSymbol) {
     sdecrvAddress = _sdecrvAddress;
     feeRecipient = _feeRecipient;
     curvePool = ICurve(_curvePool);
@@ -123,6 +123,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    */
    function setCap(uint256 _newCap) external onlyOwner {
      cap = _newCap;
+
      emit CapUpdated(_newCap);
    }
 
@@ -131,9 +132,11 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    */
   function totalStakedaoAsset() public view returns (uint256) {
     uint256 debt = 0;
+
     for (uint256 i = 0; i < actions.length; i++) {
       debt = debt.add(IAction(actions[i]).currentValue());
     }
+
     return _balance().add(debt);
   }
 
@@ -296,6 +299,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   function emergencyPause() external onlyOwner {
     stateBeforePause = state;
     state = VaultState.Emergency;
+
     emit StateUpdated(VaultState.Emergency);
   }
 
@@ -305,6 +309,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   function resumeFromPause() external onlyOwner {
     require(state == VaultState.Emergency, "!Emergency");
     state = stateBeforePause;
+
     emit StateUpdated(stateBeforePause);
   }
 

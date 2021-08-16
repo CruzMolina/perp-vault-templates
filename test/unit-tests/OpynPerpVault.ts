@@ -5,9 +5,9 @@ import { expect } from 'chai';
 import { MockAction, MockERC20, OpynPerpVault, MockWETH, MockStakedao, MockCurve } from '../../typechain';
 
 enum VaultState {
-  Locked,
-  Unlocked,
   Emergency,
+  Locked,
+  Unlocked
 }
 
 describe('OpynPerpVault Tests', function () {
@@ -178,6 +178,7 @@ describe('OpynPerpVault Tests', function () {
       expect(shares1After.sub(shares1Before).eq(expectedShares)).to.be.true
       expect(expectedShares).to.be.equal(depositAmount);
     });
+
     it('p1 deposits more ETH', async () => {
       const shares1Before = await vault.balanceOf(depositor1.address)
       const expectedShares = await vault.getSharesByDepositAmount(depositAmount)
@@ -199,7 +200,7 @@ describe('OpynPerpVault Tests', function () {
       expect(expectedShares).to.be.equal(depositAmount);
     });
 
-    it('p2 depoits', async() => { 
+    it('p2 deposits', async() => {
       const shares2Before = await vault.balanceOf(depositor2.address)
       const expectedShares = await vault.getSharesByDepositAmount(depositAmount)
       const vaultTotalBefore = await vault.totalStakedaoAsset();
@@ -219,10 +220,12 @@ describe('OpynPerpVault Tests', function () {
       expect(shares2After.sub(shares2Before).eq(expectedShares)).to.be.true
       expect(expectedShares).to.be.equal(depositAmount);
     })
+
     it('p3 should not be able to withdraw if they havent deposited', async () => {
       // depositor 3 withdraws 10 eth
       await expect(vault.connect(depositor3).withdrawETH(depositAmount, depositAmount)).to.be.revertedWith('ERC20: burn amount exceeds balance');
     });
+
     it('p1 should be able to withdraw ETH', async () => {
       const shares1Before = await vault.balanceOf(depositor1.address);
       const vaultTotalBefore = await vault.totalStakedaoAsset();
@@ -239,20 +242,23 @@ describe('OpynPerpVault Tests', function () {
       expect(vaultBalanceBefore.sub(vaultBalanceAfter)).to.be.equal(depositAmount);
       expect(vaultTotalBefore.sub(vaultTotalAfter)).to.be.equal(depositAmount);
       expect((await vault.totalETHControlled()).eq(vaultTotalAfter), 'total eth controlled should update').to.be.true;
-
     });
+
     it('should revert when calling closePosition', async () => {
       await expect(vault.connect(owner).closePositions()).to.be.revertedWith('!Locked');
     });
+
     it('should revert if rollover is called with total percentage > 100', async () => {
       // max percentage sum should be 90% (9000) because 10% is set for reserve
       await expect(vault.connect(owner).rollOver([5000, 5000])).to.be.revertedWith(
         'PERCENTAGE_SUM_EXCEED_MAX'
       );
     });
+
     it('should revert if rollover is called with invalid percentage array', async () => {
       await expect(vault.connect(owner).rollOver([5000])).to.be.revertedWith('INVALID_INPUT');
     });
+
     it('should rollover to the next round', async () => {
       const vaultBalanceBefore = await sdecrv.balanceOf(vault.address);
       const action1BalanceBefore = await sdecrv.balanceOf(action1.address);
@@ -281,6 +287,7 @@ describe('OpynPerpVault Tests', function () {
 
       expect((await vault.state()) === VaultState.Locked).to.be.true;
     });
+
     it('should revert when trying to call rollover again', async () => {
       await expect(vault.connect(owner).rollOver([7000, 2000])).to.be.revertedWith('!Unlocked');
     });
