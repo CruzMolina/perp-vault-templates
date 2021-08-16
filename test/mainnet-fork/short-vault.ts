@@ -31,9 +31,9 @@ enum VaultState {
 }
 
 enum ActionState {
-  Idle,
+  Activated,
   Committed,
-  Activated
+  Idle,
 }
 
 describe('Mainnet Fork Tests', function() {
