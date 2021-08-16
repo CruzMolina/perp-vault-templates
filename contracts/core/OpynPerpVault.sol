@@ -99,17 +99,15 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   /** 
    * @dev can only be called if actions are initialized 
    */
-  modifier actionsInitialized {
+  function actionsInitialized() private view {
     require(actions.length > 0, "O1");
-    _;
   }
   
   /**
    * @dev can only be executed if vault is not in emergency state
    */
-  modifier notEmergency {
+  function notEmergency() private view {
     require(state != VaultState.Emergency, "O2");
-    _;
   }
 
   /*=====================
@@ -191,7 +189,9 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    * @dev deposit into the curvePool, then into stakedao, then mint the shares to depositor, and emit the deposit event
    * @param minEcrv minimum amount of ecrv to get out from adding liquidity. 
    */
-  function depositETH(uint256 minEcrv) external payable nonReentrant notEmergency actionsInitialized {
+  function depositETH(uint256 minEcrv) external payable nonReentrant {
+    notEmergency();
+    actionsInitialized();
     uint256 amount = msg.value;
     require(amount > 0, 'O6');
 
@@ -230,7 +230,9 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    * @dev burns shares, withdraws ecrv from stakdao, withdraws ETH from curvePool
    * @param _share is the number of vault shares to be burned
    */
-  function withdrawETH(uint256 _share, uint256 minEth) external nonReentrant notEmergency actionsInitialized {
+  function withdrawETH(uint256 _share, uint256 minEth) external nonReentrant {
+    notEmergency();
+    actionsInitialized();
     uint256 currentSdecrvBalance = _balance();
     uint256 sdecrvToWithdraw = _getWithdrawAmountByShares(_share);
     require(sdecrvToWithdraw <= currentSdecrvBalance, 'O8');
@@ -263,7 +265,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
    * @notice anyone can call this to close out the previous round by calling "closePositions" on all actions. 
    * @dev iterrate through each action, close position and withdraw funds
    */
-  function closePositions() public actionsInitialized {
+  function closePositions() public {
+    actionsInitialized();
     require(state == VaultState.Locked, "O11");
     state = VaultState.Unlocked;
 
@@ -284,7 +287,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   /**
    * @notice can only be called when the vault is unlocked. It sets the state to locked and distributes funds to each action.
    */
-  function rollOver(uint256[] calldata _allocationPercentages) external onlyOwner nonReentrant actionsInitialized {
+  function rollOver(uint256[] calldata _allocationPercentages) external onlyOwner nonReentrant {
+    actionsInitialized();
     require(_allocationPercentages.length == actions.length, 'O12');
     require(state == VaultState.Unlocked, "O13");
     state = VaultState.Locked;
