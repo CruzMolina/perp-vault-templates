@@ -304,7 +304,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
     uint256 sumPercentage = withdrawReserve;
     address cacheAddress = sdecrvAddress;
 
-    for (uint8 i = 0; i < actions.length; i = i + 1) {
+    for (uint8 i = 0; i < _allocationPercentages.length; i = i + 1) {
       sumPercentage = sumPercentage.add(_allocationPercentages[i]);
       require(sumPercentage <= cacheBase, 'O14');
 
@@ -385,8 +385,8 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   function _getSharesByDepositAmount(uint256 _amount, uint256 _totalAssetAmount) internal view returns (uint256) {
     uint256 shareSupply = totalSupply();
 
-    uint256 shares = shareSupply == 0 ? _amount : _amount.mul(shareSupply).div(_totalAssetAmount);
-    return shares;
+    // share amount
+    return shareSupply == 0 ? _amount : _amount.mul(shareSupply).div(_totalAssetAmount);
   }
 
   /**
@@ -395,8 +395,9 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   function _getWithdrawAmountByShares(uint256 _share) internal view returns (uint256) {
     uint256 totalAssetAmount = totalStakedaoAsset();
     uint256 shareSupply = totalSupply();
-    uint256 withdrawAmount = _share.mul(totalAssetAmount).div(shareSupply);
-    return withdrawAmount;
+
+    // withdrawal amount
+    return _share.mul(totalAssetAmount).div(shareSupply);
   }
 
   /**
