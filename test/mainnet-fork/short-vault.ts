@@ -150,7 +150,7 @@ describe('Mainnet Fork Tests', function() {
       curveAddress,
       0, // type 0 vault
       weth.address,
-      100
+      20 // 0.2%
     )) as ShortOTokenActionWithSwap;
 
     await vault.connect(owner).setActions(
