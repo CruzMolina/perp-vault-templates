@@ -322,6 +322,13 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   }
 
   /**
+   * @dev set the vault withdrawal fee recipient
+   */
+  function setWithdrawalFeeRecipient(address _newWithdrawalFeeRecipient) external onlyOwner {
+    feeRecipient = _newWithdrawalFeeRecipient;
+  }
+
+  /**
    * @dev set the percentage that should be reserved in vault for withdraw
    */
   function setWithdrawalFeePercentage(uint256 _newWithdrawalFeePercentage) external onlyOwner {
