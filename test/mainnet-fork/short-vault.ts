@@ -416,7 +416,7 @@ describe('Mainnet Fork Tests', function() {
 
       // check sdeCRV balance in action and vault
       expect(vaultSdecrvBalanceAfter).to.be.within(
-        expectedSdecrvBalanceInVault.sub(1).toString() as any, expectedSdecrvBalanceInVault.add(1).toString() as any, "incorrect balance in vault"
+        expectedSdecrvBalanceInVault.sub(1) as any, expectedSdecrvBalanceInVault.add(1) as any, "incorrect balance in vault"
       );
       expect(
         (await vault.totalStakedaoAsset()).gte(expectedTotal),
