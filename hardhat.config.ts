@@ -59,7 +59,7 @@ export default {
   },
   contractSizer: {
     alphaSort: true,
-    runOnCompile: true,
+    runOnCompile: process.env.COVERAGE ? false: true,
     disambiguatePaths: false,
   },
   gasReporter: {
