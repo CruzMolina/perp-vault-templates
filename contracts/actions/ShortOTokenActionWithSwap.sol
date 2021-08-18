@@ -321,7 +321,6 @@ contract ShortOTokenActionWithSwap is IAction, AirswapBase, RollOverBase {
     uint256 spotPrice = oracle.getPrice(address(weth));
     // checks that the strike price set is > than 105% of current price
     return strikePrice >= spotPrice.mul(MIN_STRIKE).div(BASE);
-    return true;
   }
 
   /**
