@@ -2,11 +2,12 @@
 
 pragma solidity ^0.7.2;
 
+import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
+import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+
+import { ICurve } from '../interfaces/ICurve.sol';
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IStakeDao } from "../interfaces/IStakeDao.sol";
-import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { SafeMath } from '@openzeppelin/contracts/math/SafeMath.sol';
-import { ICurve } from '../interfaces/ICurve.sol';
 
 /**
  * Error Codes
@@ -27,17 +28,17 @@ import { ICurve } from '../interfaces/ICurve.sol';
 contract StakedaoEcrvPricer {
     using SafeMath for uint256;
 
+    /// @notice curve pool
+    ICurve public curve;
+
+    /// @notice underlying asset for this lpToken
+    IERC20 public underlying;
+
     /// @notice opyn oracle address
     IOracle public oracle;
 
     /// @notice lpToken that this pricer will a get price for
     IStakeDao public lpToken;
-
-    /// @notice underlying asset for this lpToken
-    IERC20 public underlying;
-
-    /// @notice curve pool
-    ICurve public curve;
 
     /**
      * @param _lpToken lpToken asset
