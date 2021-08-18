@@ -195,16 +195,15 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
   function depositETH(uint256 minEcrv) external payable nonReentrant {
     notEmergency();
     actionsInitialized();
-    uint256 amount = msg.value;
-    require(amount > 0, 'O6');
+    require(msg.value > 0, 'O6');
 
     // the sdecrv is already deposited into the contract at this point, need to substract it from total
     uint256[2] memory amounts;
-    amounts[0] = amount;
+    amounts[0] = msg.value;
     amounts[1] = 0; // not depositing any seth
 
     // deposit ETH to curvePool
-    curvePool.add_liquidity{value:amount}(amounts, minEcrv);
+    curvePool.add_liquidity{value:msg.value}(amounts, minEcrv);
 
     // keep track of balance before
     uint256 totalSdecrvBalanceBeforeDeposit = totalStakedaoAsset();
@@ -224,7 +223,7 @@ contract OpynPerpVault is ERC20, ReentrancyGuard, Ownable {
     uint256 sdecrvDeposited = totalWithDepositedAmount.sub(totalSdecrvBalanceBeforeDeposit);
     uint256 share = _getSharesByDepositAmount(sdecrvDeposited, totalSdecrvBalanceBeforeDeposit);
 
-    emit Deposit(msg.sender, amount, share);
+    emit Deposit(msg.sender, msg.value, share);
 
     _mint(msg.sender, share);
   }
