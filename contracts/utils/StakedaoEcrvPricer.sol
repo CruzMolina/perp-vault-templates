@@ -92,10 +92,9 @@ contract StakedaoEcrvPricer {
      */
     function _underlyingPriceToYtokenPrice(uint256 _underlyingPrice) private view returns (uint256) {
         uint256 pricePerShare = lpToken.getPricePerFullShare();
-        uint8 underlyingDecimals = 18;
         uint256 curvePrice = curve.get_virtual_price();
 
-        return pricePerShare.mul(_underlyingPrice).mul(curvePrice).div(10**uint256(2 * underlyingDecimals));
+        return pricePerShare.mul(_underlyingPrice).mul(curvePrice).div(10**uint256(2 * 18));
     }
 
     function getHistoricalPrice(uint80) external pure returns (uint256, uint256) {
